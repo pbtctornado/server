@@ -1,0 +1,11 @@
+To run the server
+$ cd src
+$ ts-node index.ts
+
+If you have redis error on startup, try to run
+$ redis-server
+
+To delete all keys in redis, run:
+$ redis-cli FLUSHALL
+(see https://www.shellhacks.com/redis-delete-all-keys-redis-cli/)
+
