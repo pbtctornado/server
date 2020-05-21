@@ -10,7 +10,7 @@ const PTOKEN_ADDRESS = {
 const BASE_BLOCK_NUMBER = 7575311;
 
 // How often to check new Minted events ( seconds * 1000 )
-const WATCHER_INTERVAL = 20 * 1000;
+const WATCHER_INTERVAL = 240 * 1000;
 
 const REDIS_CONFIG = {
     host: '127.0.0.1',

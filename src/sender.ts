@@ -12,7 +12,7 @@ class Sender {
     sendEtherToAddress = async (address: string) => {
         try {
             const web3 = this.web3;
-            console.log('Sending ether to user...')
+            console.log('\nSending ether to user...')
             // TODO get better gas and value estimate
             // ETH value estimate to send:  [(current gas price + margin) * gas cost for approve approve transaction]
             let signedTx = await web3.eth.accounts.signTransaction(
@@ -36,7 +36,7 @@ class Sender {
 
     sendRawTransaction = async (rawTx: string) => {
         try {
-            console.log('Sending approve...')
+            console.log('\nSending approve...')
             let result = await this.web3.eth.sendSignedTransaction(rawTx);
             console.log(result)
         } catch (e) {

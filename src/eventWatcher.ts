@@ -45,29 +45,30 @@ class MintedEventWatcher {
         this.lastCheckedBlockNumber = BASE_BLOCK_NUMBER;
     }
 
-    addJobs = async (events: any) => {
+    addJobs = async (events) => {
         // go through every address in events and check if it is stored in redis database
-        for (const [address, value] of Object.entries(events)) {
+        for (let address of Object.keys(events)) {
             redisClient.exists(address, async (err, reply) => {
                 if (reply === 1) {
-                    console.log(`\nAdding ${address} to job queue...`);
-
                     // Get deposit data that belong to his address
                     redisClient.hgetall(address, async (err, userData) => {
-                        await depositsQueue.add(userData, { removeOnComplete: true });
 
-                        // check if the user has enough pBTC (uncomment when sending depositTx is implemented)
-                        // if (value >= object.btcAmount) {
-                        //     await depositsQueue.add(object);
-                        // }
+                        // parse values to Integer just to be 100% sure you compare to integers. Comparing strings might cause unexpected behaviour
+                        const pbtcReceived = parseInt(events[address]); // amount of pBTC which the user received on his ETH address
+                        const pbtcRequested = parseInt(userData.btcAmount) // amount of pBTC which the user wants to anonymize + fees
 
-                        // delete user from  after it's appended to depositQueue
-                        redisClient.del(address);
+                        if (pbtcReceived >= pbtcRequested) {
+                            console.log(`\n${address} added to job queue...`);
+                            await depositsQueue.add(userData, { removeOnComplete: true });
+                        } else {
+                            console.log(`\n${address} did not send enough BTC`);
+                        }
                     });
                 } else {
-                    // console.log(`${address} not in database`);
+                    console.log(`${address} does not exist`);
                 }
             });
+
         }
     }
 
@@ -89,8 +90,7 @@ class MintedEventWatcher {
      */
     fetchNewEvents = async () => {
         const lastCheckedBlockNumber = this.lastCheckedBlockNumber;
-        // const latestBlockNumber = await this.web3.eth.getBlockNumber();
-        const latestBlockNumber = lastCheckedBlockNumber + 15000;
+        const latestBlockNumber = await this.web3.eth.getBlockNumber();
 
         console.log(`\nGetting Minted events from block ${lastCheckedBlockNumber} to block ${latestBlockNumber}...`)
 
@@ -103,7 +103,7 @@ class MintedEventWatcher {
 
         // set the new last checked block number
         this.lastCheckedBlockNumber = latestBlockNumber;
-        // TODO save lastCheckedBlockNumber to database
+        // TODO save lastCheckedBlockNumber to database and load on next startup
 
         return events
     }
@@ -115,11 +115,10 @@ class MintedEventWatcher {
     getProcessedEvents = (events) => {
         let processedEvents = {};
 
-        // extract address and deposited amount from events newEventsProcessed = { address : amount }
+        // extract address and deposited amount from events processedEvents = { address : amount of pBTC received }
         events.forEach(event => {
-            const recipient: string = event.returnValues[1];
-            const amount: number = event.returnValues[2];
-            processedEvents[recipient] = amount
+            const recipient: string = event.returnValues[1]; /// pBTC recipient
+            processedEvents[recipient] = parseInt(event.returnValues[2]) // amount of pBTC minted (=received)
         });
 
         return processedEvents

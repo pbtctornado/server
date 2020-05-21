@@ -37,7 +37,7 @@ app.post('/sendtx', function (request, response) {
 
     // check if user's ETH address is in database already
     redisClient.exists(userAddress, async (err, reply) => {
-        if (reply === 1) {
+        if (reply === 0) {
             // add user's data to the database
             redisClient.hmset(userAddress, request.body);
 
