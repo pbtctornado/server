@@ -29,8 +29,7 @@ class Sender {
             let result = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
             console.log(result)
         } catch (e) {
-            console.log('Error while sending ETH to user')
-            console.log(e)
+            console.log('Error while sending ETH to user', e)
         }
     }
 
@@ -40,8 +39,7 @@ class Sender {
             let result = await this.web3.eth.sendSignedTransaction(rawTx);
             console.log(result)
         } catch (e) {
-            console.log('Error while sending approve() transaction')
-            console.log(e)
+            console.log('Error while sending approve() transaction', e)
         }
     }
 

@@ -25,8 +25,7 @@ depositsQueue.process(async (job, done) => {
         // const depositResponse = await sender.sendDeposit()
     } catch (e) {
         // TODO handle failed jobs (Try again later, check the error message to see which part dailed.)
-        console.log('Error while sending transactions')
-        console.log(e)
+        console.log('Error while sending transactions', e)
     }
     done();
 });

@@ -1,10 +1,12 @@
 import { eventWatcher } from './instances';
 import { redisClient } from './redis';
 import { SERVER_PORT, WATCHER_INTERVAL } from '../config';
+const fs = require("fs");
 
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser')
+const proving_key = fs.readFileSync("./withdraw_proving_key.bin");
 
 // create express app
 const app = express();
@@ -50,7 +52,10 @@ app.post('/sendtx', function (request, response) {
     });
 });
 
+app.get('/provingKey', function (req, res) {
+    res.send(proving_key)
+})
 
 // TODO setup process.env variables
 const port = process.env.PORT || SERVER_PORT; //
-app.listen(port, () => console.log(`Server listening on port ${port}...`))
+app.listen(port, () => console.log(`Server listening on port ${port}...`));
